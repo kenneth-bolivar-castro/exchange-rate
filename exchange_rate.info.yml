@@ -1,0 +1,9 @@
+name: Exchange Rate
+description: Consume ASMX SOAP service to show up exchange rate from BCCR
+package: keboca
+
+type: module
+core: 8.x
+
+dependencies:
+  - drupal:serialization

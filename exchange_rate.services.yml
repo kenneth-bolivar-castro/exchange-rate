@@ -1,0 +1,7 @@
+services:
+  exchange_rate.manager:
+    class: \Drupal\exchange_rate\ExchangeRateManager
+    arguments: ['@http_client', '@serializer', '@cache.default']
+  exchange_rate.controller:
+    class: \Drupal\exchange_rate\Controller\ExchangeRateController
+    arguments: ['@exchange_rate.manager']

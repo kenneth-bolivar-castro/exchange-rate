@@ -1,0 +1,6 @@
+exchange_rate.content:
+  path: '/exchange-rate/bccr'
+  defaults:
+    _controller: 'exchange_rate.controller:content'
+  requirements:
+    _permission: 'access content'
