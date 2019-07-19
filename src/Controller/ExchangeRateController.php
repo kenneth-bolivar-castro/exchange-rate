@@ -10,7 +10,7 @@ use Drupal\exchange_rate\ExchangeRateManager;
 /**
  * Class ExchangeRateController
  *
- * @package Drupal\exchange_rate
+ * @package Drupal\exchange_rate\Controller
  */
 class ExchangeRateController extends ControllerBase {
 
