@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Serializer;
 /**
  * Class ExchangeRateManager
  *
- * @package Drupal\exchange_rate\ExchangeRateManager
+ * @package Drupal\exchange_rate
  */
 class ExchangeRateManager {
 
