@@ -3,8 +3,12 @@
 namespace Drupal\exchange_rate;
 
 use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\Config;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Site\Settings;
 use GuzzleHttp\Client;
 use Symfony\Component\Serializer\Serializer;
 
@@ -30,6 +34,12 @@ class ExchangeRateManager {
    */
   protected $cache;
 
+  /** @var \Drupal\Core\Config\ImmutableConfig */
+  protected $config;
+
+  /** @var string */
+  protected $siteName;
+
   /**
    * ExchangeRateManager constructor.
    *
@@ -37,10 +47,12 @@ class ExchangeRateManager {
    * @param \Symfony\Component\Serializer\Serializer $serializer
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    */
-  public function __construct(Client $http_client, Serializer $serializer, CacheBackendInterface $cacheBackend) {
+  public function __construct(Client $http_client, Serializer $serializer, CacheBackendInterface $cacheBackend, ConfigFactory $configFactory) {
     $this->httpClient = $http_client;
     $this->serializer = $serializer;
     $this->cache = $cacheBackend;
+    $this->config = $configFactory->get('exchange_rate.settings');
+    $this->siteName = $configFactory->get('system.site')->get('name');
   }
 
   /**
@@ -55,32 +67,31 @@ class ExchangeRateManager {
     // Extract date range.
     list($start_date, $end_date) = $dates;
 
-    // Build query string.
+    // Build expected parameters.
     $params = [
-      'tcIndicador' => $type,
-      'tcFechaInicio' => $start_date,
-      'tcFechaFinal' => $end_date,
-      'tcNombre' => time(),
-      'tnSubNiveles' => 'N',
+      'Indicador' => $type,
+      'FechaInicio' => $start_date,
+      'FechaFinal' => $end_date,
+      'Nombre' => $this->siteName,
+      'SubNiveles' => 'N',
+      'CorreoElectronico' => $this->config->get('email'),
+      'Token' => $this->config->get('token'),
     ];
-
-    // Define endpoint URL.
-    $query_string = http_build_query($params);
-    $url = sprintf(
-    //@TODO: I highly recommend to use configuration instead of URL hardcoded.
-      'http://indicadoreseconomicos.bccr.fi.cr/indicadoreseconomicos/WebServices/wsIndicadoresEconomicos.asmx/ObtenerIndicadoresEconomicosXML?%s',
-      $query_string
-    );
 
     // Init resource variable.
     $resource = NULL;
 
     try {
-      // Consume service.
-      $response = $this->httpClient->get($url);
+      /** @var string $url */
+      $url = $this->config->get('endpoint');
+
+      /** @var \GuzzleHttp\Psr7\Response  $response */
+      $response = $this->httpClient->post($url, [
+        'form_params' => $params
+      ]);
 
       // Verify HTTP response code.
-      if ($response->getStatusCode() == 200) {
+      if (200 == $response->getStatusCode()) {
         // Retrieve XML response content.
         $xml = $response->getBody()->getContents();
 

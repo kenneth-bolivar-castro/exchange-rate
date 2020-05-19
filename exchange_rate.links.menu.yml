@@ -1,0 +1,6 @@
+exchange_rate.settings:
+  title: Exchange rate settings
+  description: Store API Credentials
+  parent: system.admin_config_system
+  route_name: exchange_rate.settings
+  weight: 10

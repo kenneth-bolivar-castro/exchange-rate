@@ -4,3 +4,11 @@ exchange_rate.content:
     _controller: 'exchange_rate.controller:content'
   requirements:
     _permission: 'access content'
+
+exchange_rate.settings:
+  path: '/admin/config/system/exchange-rate-settings'
+  defaults:
+    _title: 'Exchange rate settings'
+    _form: 'Drupal\exchange_rate\Form\ExchangeRateSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'

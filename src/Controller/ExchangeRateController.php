@@ -28,6 +28,10 @@ class ExchangeRateController extends ControllerBase {
     $this->manager = $exchangeRateManager;
   }
 
+  /**
+   * Callback function triggered when route `exchange_rate.content` is invoked.
+   * @return array
+   */
   public function content() {
     // Init content variable and extract current timestamp.
     $content = [];
@@ -67,12 +71,13 @@ class ExchangeRateController extends ControllerBase {
           $this->t('Date'),
           $this->t('Rate'),
         ],
+        '#empty' => $this->t('None data was retrieved.'),
         '#rows' => array_map(function ($item) {
           return [
             $item['date'],
             $item['rate'],
           ];
-        }, $resource),
+        }, $resource ?? []),
       ];
     }
 
